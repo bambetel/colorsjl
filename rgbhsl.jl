@@ -1,6 +1,6 @@
 # Convert RGB color to HSL
 # arguments: 0-255 R, G, B values
-# returns H - degrees, S, L - percent
+# returns H - degrees [0,360), S, L - percent
 function rgbToHsl(R, G, B)
 	r = R/255.0; g = G/255.0; b = B/255.0
 	cmax = max(r, g, b)
@@ -17,10 +17,10 @@ function rgbToHsl(R, G, B)
 			(r-g)/delta + 4
 		end
 
-	lum = (cmax + cmin) / 2
+	lum = (cmax + cmin) / 2.0
 	sat = if (delta == 0) 0 else delta / (1 - abs(2 * lum - 1)) end 
 
-	return hue, sat, lum
+	return Int(round(hue%360)), round(sat*100.0,digits=2), round(lum*100.0,digits=2)
 end
 
 function hslToRgb(H, S, L) 
@@ -38,10 +38,10 @@ function hslToRgb(H, S, L)
 		b = fromHsl(p, q, h - 1/3)
 	end
 
-	return round(r*255.0), round(g*255.0), round(b*255.0)
+	return Int(round(r*255.0)), Int(round(g*255.0)), Int(round(b*255.0))
 end
 
-function fromHsl(p, q, t) 
+function fromHsl(p::Float64, q::Float64, t::Float64) 
 	if t < 0
 		t += 1
 	elseif t > 1 
